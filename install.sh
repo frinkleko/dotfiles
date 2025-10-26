@@ -10,7 +10,7 @@ BACKUP_DIR="${HOME_DIR}/.dotfiles_backup_${TIMESTAMP}"
 PACKAGE_MANAGER="none"
 
 DO_PACKAGES=1
-MAKE_ZSH_DEFAULT=0
+MAKE_ZSH_DEFAULT=1
 DRY_RUN=0
 INSTALL_CLASH=0
 PROMPT_CLASH=1
@@ -27,7 +27,7 @@ usage() {
   cat <<EOF
 Usage: $(basename "$0") [options]
   --no-packages         Do not install packages (only link dotfiles)
-  --make-zsh-default    Change default shell to zsh (if available)
+  --no-zsh-default      Do not change default shell to zsh
   --dry-run             Show what would be done, do not change anything
   --install-clash       Install clash-for-linux without prompting (defaults to proxy)
   --clash-use-proxy     Force GitHub proxy for clash-for-linux clone
@@ -40,7 +40,7 @@ EOF
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --no-packages) DO_PACKAGES=0; shift ;;
-    --make-zsh-default) MAKE_ZSH_DEFAULT=1; shift ;;
+    --no-zsh-default) MAKE_ZSH_DEFAULT=0; shift ;;
     --dry-run) DRY_RUN=1; shift ;;
   --install-clash) INSTALL_CLASH=1; PROMPT_CLASH=0; shift ;;
     --clash-use-proxy) CLASH_PROXY_MODE="proxy"; shift ;;
@@ -158,7 +158,7 @@ install_uv() {
     if [[ "${pmgr}" != "none" ]]; then
       echo "[DRY RUN] Would install uv via ${pmgr} (falls back to official installer if unavailable)."
     else
-      echo "[DRY RUN] Would install uv via official installer script (requires curl)."
+      echo "[DRY RUN] Would run: curl -LsSf https://astral.sh/uv/install.sh | sh"
     fi
     return 0
   fi
@@ -176,14 +176,14 @@ install_uv() {
   fi
 
   if have curl; then
-    echo "Installing uv via official installer script."
-    if curl -fsSL https://astral.sh/install.sh | sh; then
+    echo "Installing uv via official installer script (curl -LsSf https://astral.sh/uv/install.sh | sh)."
+    if curl -LsSf https://astral.sh/uv/install.sh | sh; then
       echo "uv installed via official installer."
       return 0
     fi
     echo "Official uv installer failed."
   else
-    echo "curl not available; cannot run official uv installer."
+    echo "curl not available; cannot run official uv installer (curl -LsSf https://astral.sh/uv/install.sh | sh)."
   fi
 
   echo "uv installation was not successful. Please install manually if needed."
@@ -367,7 +367,7 @@ install_tmux_plugin_manager() {
 
 maybe_change_shell_to_zsh() {
   if [[ "${MAKE_ZSH_DEFAULT}" -ne 1 ]]; then
-    echo "Skipping default shell change. Re-run with --make-zsh-default if desired."
+    echo "Skipping default shell change (--no-zsh-default provided)."
     return
   fi
 
