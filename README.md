@@ -10,7 +10,7 @@ Prefer step-by-step? Run each command individually inside zsh.
 
 ## Options
 - `bash install.sh --no-packages`       # only link dotfiles
-- `bash install.sh --make-zsh-default`  # set zsh as default shell
+- `bash install.sh --no-zsh-default`    # keep your current default shell
 - `bash install.sh --dry-run`           # preview actions without making changes
 - `bash install.sh --install-clash`     # install clash-for-linux without prompting (defaults to gh-proxy.com)
 - `bash install.sh --clash-use-proxy`   # force GitHub proxy for the clash installer
